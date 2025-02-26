@@ -11,6 +11,7 @@ const TodoListStore = useTodoListStore();
 
 <template>
     <div class="relative border p-8 md:rounded-lg bg-white">
+      <h2 class="mb-4 text-lg font-semibold text-brand-red">{{ TodoListStore.editingTodo ? `Editing #${TodoListStore.editingTodo}` : 'Create new todo' }}</h2>
       <div class="grid sm:grid-cols-5 lg:grid-cols-9 gap-4">
         <TextInput class="sm:col-span-2 lg:col-span-3"
                    v-model="TodoListStore.form.title"
@@ -37,10 +38,10 @@ const TodoListStore = useTodoListStore();
                        class="w-24"
                        type="submit"
                        :is-thinking="TodoListStore.isThinking"
-                       @click="TodoListStore.storeTodo()">
-          Create
+                       @click="TodoListStore.saveTodo()">
+          {{ TodoListStore.editingTodo ? 'Update' : 'Create' }}
         </PrimaryButton>
       </div>
-      <XCircleIcon class="absolute top-2 right-2 size-6 mx-auto text-brand-red cursor-pointer" @click="TodoListStore.closeNewTodo()"/>
+      <XCircleIcon class="absolute top-2 right-2 size-6 mx-auto text-brand-red cursor-pointer" @click="TodoListStore.closeForm()"/>
     </div>
 </template>

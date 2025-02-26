@@ -14,11 +14,11 @@ const TodoListStore = useTodoListStore();
       <div class="mb-10 grid lg:grid-cols-3 sm:grid-cols-2 gap-4">
         <TodoCard v-for="(todo, index) in TodoListStore.todos" :index="todo.id" :todo="todo" :card-index="index + 1"/>
       </div>
-      <TodoForm v-if="TodoListStore.newTodoOpen"/>
+      <TodoForm v-if="TodoListStore.formOpen"/>
     </div>
     <div class="absolute -bottom-5 w-full flex items-center">
       <div class="mx-auto flex items-center size-10 rounded-full p-1 bg-brand-red text-white cursor-pointer hover:bg-white hover:ring hover:ring-brand-red hover:text-brand-red"
-      @click="TodoListStore.openNewTodo()">
+      @click="TodoListStore.openForm()">
         <PlusIcon class="size-8 mx-auto"/>
       </div>
     </div>

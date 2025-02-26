@@ -12,8 +12,9 @@ export const useTodoListStore = defineStore('TodoListStore', {
       status: 'todo',
       deadline_at: '',
     },
+    editingTodo: null,
     isThinking: false,
-    newTodoOpen: false,
+    formOpen: false,
   }),
 
   actions: {
@@ -54,28 +55,57 @@ export const useTodoListStore = defineStore('TodoListStore', {
       this.todos = data.todos;
     },
 
-    openNewTodo() {
+    openForm() {
       this.resetForm();
-      this.newTodoOpen = true;
+      this.formOpen = true;
     },
 
-    closeNewTodo() {
-      this.newTodoOpen = false;
+    closeForm() {
+      this.formOpen = false;
+      this.editingTodo = null;
+      this.resetForm();
+    },
+
+    editTodo(todo, cardIndex) {
+      this.resetErrors();
+      this.editingTodo = cardIndex;
+      this.form = {
+        title: todo.title,
+        description: todo.description,
+        deadline_at: todo.deadline_at,
+      };
+
+      this.formOpen = true;
     },
 
     resetForm() {
       this.resetErrors();
-      this.form = {
-        title: '',
-        description: '',
-        status: 'todo',
-        deadline_at: '',
-        created_by: '',
-      };
+
+      if(this.editingTodo !== null) {
+        this.form = {
+          title: this.todos[this.arrayIndex].title,
+          description: this.todos[this.arrayIndex].description,
+          deadline_at: this.todos[this.arrayIndex].deadline_at,
+        };
+        } else {
+        this.form = {
+          title: '',
+          description: '',
+          deadline_at: '',
+        };
+      }
     },
 
     resetErrors() {
       this.errors = {};
+    },
+
+    saveTodo() {
+      if(this.editingTodo !== null) {
+        this.updateTodo();
+      } else {
+        this.storeTodo();
+      }
     },
 
     async storeTodo() {
@@ -97,7 +127,28 @@ export const useTodoListStore = defineStore('TodoListStore', {
             created_at: format(new Date(), "yyyy-MM-dd"),
           });
 
-          this.newTodoOpen = false;
+          this.formOpen = false;
+        } else {
+          this.errors = response.data.errors;
+        }
+      }, 2000);
+    },
+
+    async updateTodo() {
+      // fake a basic update API call with fake loading time
+      this.isThinking = true;
+      setTimeout(()=>{
+        this.isThinking = false;
+
+        const response = this.validateForm();
+
+        if (response.data.success) {
+          this.todos[this.arrayIndex].title = this.form.title;
+          this.todos[this.arrayIndex].description = this.form.description;
+          this.todos[this.arrayIndex].deadline_at = this.form.deadline_at;
+
+          this.formOpen = false;
+          this.editingTodo = null;
         } else {
           this.errors = response.data.errors;
         }
@@ -153,6 +204,7 @@ export const useTodoListStore = defineStore('TodoListStore', {
   getters: {
     isFormDirty: (state) => {
       return state.form.title || state.form.description || state.form.deadline_at;
-    }
+    },
+    arrayIndex: (state) => state.editingTodo - 1,
   }
 })
