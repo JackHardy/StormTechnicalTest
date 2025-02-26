@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header class="bg-gray-200 text-gray-500">
+  <header class="bg-brand-red text-white">
     <div class="max-w-7xl mx-auto flex items-center p-4">
       <!-- Logo Section -->
       <div class="flex-shrink-0">

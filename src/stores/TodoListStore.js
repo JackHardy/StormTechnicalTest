@@ -1,9 +1,19 @@
-import { computed } from 'vue'
 import { defineStore } from 'pinia'
+import {reactive} from "vue";
+import {format, addDays, subDays} from "date-fns";
 
 export const useTodoListStore = defineStore('TodoListStore', {
   state: () => ({
     todos: [],
+    errors: {},
+    form: {
+      title: '',
+      description: '',
+      status: 'todo',
+      deadline_at: '',
+    },
+    isThinking: false,
+    newTodoOpen: false,
   }),
 
   actions: {
@@ -16,32 +26,115 @@ export const useTodoListStore = defineStore('TodoListStore', {
             title: 'Tidy the office',
             description: '',
             status: 'todo',
-            deadline_at: '2025-02-23 12:00:00',
+            deadline_at: format(addDays(new Date(), 1), "yyyy-MM-dd"),
             created_by: 'Jack Hardy',
-            created_at: '2025-02-25 13:53:23',
+            created_at: format(subDays(new Date(), 1), "yyyy-MM-dd"),
           },
           {
             id: 2,
             title: 'Learn Pinia',
             description: 'You can find the docs at https://pinia.vuejs.org/',
             status: 'in-progress',
-            deadline_at: '2025-02-28 10:00:00',
+            deadline_at: format(addDays(new Date(), 2), "yyyy-MM-dd"),
             created_by: 'Victor Saly',
-            created_at: '2025-02-24 08:24:34',
+            created_at: format(subDays(new Date(), 3), "yyyy-MM-dd"),
           },
           {
             id: 3,
             title: 'Build a Todo App',
             description: 'This should include the ability to add, edit, and delete todos',
             status: 'completed',
+            deadline_at: format(new Date(), "yyyy-MM-dd"),
             created_by: 'Jack Hardy',
-            deadline_at: '2025-02-26 22:00:00',
-            created_at: '2025-02-26 15:21:56',
+            created_at: format(subDays(new Date(), 1), "yyyy-MM-dd"),
           }
         ],
       };
 
       this.todos = data.todos;
+    },
+
+    openNewTodo() {
+      this.resetForm();
+      this.newTodoOpen = true;
+    },
+
+    closeNewTodo() {
+      this.newTodoOpen = false;
+    },
+
+    resetForm() {
+      this.resetErrors();
+      this.form = {
+        title: '',
+        description: '',
+        status: 'todo',
+        deadline_at: '',
+        created_by: '',
+      };
+    },
+
+    resetErrors() {
+      this.errors = {};
+    },
+
+    async storeTodo() {
+      // fake a basic store API call with fake loading time
+      this.isThinking = true;
+      setTimeout(()=>{
+        this.isThinking = false;
+
+        const response = this.validateForm();
+
+        if (response.data.success) {
+          this.todos.push({
+            id: this.todos.length + 1,
+            title: this.form.title,
+            description: this.form.description,
+            status: 'todo',
+            deadline_at: this.form.deadline_at,
+            created_by: 'Victor Saly',
+            created_at: format(new Date(), "yyyy-MM-dd"),
+          });
+
+          this.newTodoOpen = false;
+        } else {
+          this.errors = response.data.errors;
+        }
+      }, 2000);
+    },
+
+    validateForm() {
+      const errors = {};
+
+      if(!this.form.title) {
+        errors.title = 'The title field is required';
+      }
+
+      if(!this.form.description) {
+        errors.description = 'The description field is required';
+      }
+
+      if(!this.form.deadline_at) {
+        errors.deadline_at = 'The deadline field is required';
+      }
+
+      if(Object.keys(errors).length === 0) {
+        return {
+          data: {
+            success: true,
+            message: 'Todo created successfully',
+          }
+        };
+      } else {
+        return {
+          data: {
+            success: false,
+            message: 'The form contains errors',
+            errors: errors,
+          }
+        };
+      }
     },
 
     deleteTodo(id) {
@@ -56,4 +149,10 @@ export const useTodoListStore = defineStore('TodoListStore', {
       }
     }
   },
+
+  getters: {
+    isFormDisabled: (state) => {
+      return !state.form.title || !state.form.description || !state.form.deadline_at;
+    }
+  }
 })

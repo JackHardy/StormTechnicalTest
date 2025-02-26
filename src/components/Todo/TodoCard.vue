@@ -2,7 +2,7 @@
 import {computed, ref} from "vue";
 import { TrashIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/solid'
 import { useTodoListStore } from "@/stores/TodoListStore.js";
-import { isToday } from "date-fns";
+import { isToday, isPast } from "date-fns";
 
 const props = defineProps({
   todo: {
@@ -18,7 +18,7 @@ const props = defineProps({
 const TodoListStore = useTodoListStore();
 const open = ref(false);
 const warning = computed(() => {
-  return isToday(props.todo.deadline_at);
+  return isToday(props.todo.deadline_at) || isPast(props.todo.deadline_at);
 });
 </script>
 
