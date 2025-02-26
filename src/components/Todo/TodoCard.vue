@@ -3,6 +3,7 @@ import {computed, ref} from "vue";
 import { TrashIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/solid'
 import { useTodoListStore } from "@/stores/TodoListStore.js";
 import { isToday, isPast } from "date-fns";
+import TodoStatusBadge from "@/components/Badges/TodoStatusBadge.vue";
 
 const props = defineProps({
   todo: {
@@ -27,29 +28,35 @@ const warning = computed(() => {
       :class="[open ? 'h-48' : 'h-fit']"
       class="group py-4 overflow-hidden gap-4 flex flex-col justify-between rounded-lg bg-white shadow-lg border border-brand-gray cursor-pointer hover:ring-brand-red hover:ring hover:ring-offset-2 hover:border-none hover-shadow-xl"
        @click="open = !open">
-    <div class="px-4 sm:px-6 flex items-center justify-between h-10">
-      <div class="flex gap-2">
-        <div class="relative flex size-7">
-          <div class="z-10 size-7 flex items-center rounded-full p-1 bg-brand-red text-white">
-            <div v-if="warning">
-              <ExclamationTriangleIcon class="size-5 mx-auto"/>
+    <div>
+      <div class="px-4 sm:px-6 flex items-center justify-between h-10">
+        <div class="flex items-center gap-2">
+          <div class="relative flex size-7">
+            <div class="z-10 size-7 flex items-center rounded-full p-1 bg-brand-red text-white">
+              <div v-if="warning">
+                <ExclamationTriangleIcon class="size-5 mx-auto"/>
+              </div>
+              <p v-else class="w-full text-center">
+                {{ cardIndex }}
+              </p>
             </div>
-            <p v-else class="w-full text-center">
-              {{ cardIndex }}
-            </p>
+            <div :class="{ 'animate-ping': warning }" class="absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></div>
           </div>
-          <div :class="{ 'animate-ping': warning }" class="absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></div>
+          <div>
+            {{ todo.title }}
+          </div>
+          <TodoStatusBadge :status="isPast(props.todo.deadline_at) && !isToday(props.todo.deadline_at) ? 'overdue' : todo.status"/>
         </div>
         <div>
-          {{ todo.title }}
+          <div class="size-7 flex items-center rounded-full p-1 hidden group-hover:block hover:bg-brand-red hover:text-white size-5 text-brand-red"
+          @click="TodoListStore.deleteTodo(todo.id)">
+            <TrashIcon class="size-5 mx-auto"/>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="size-7 flex items-center rounded-full p-1 hidden group-hover:block hover:bg-brand-red hover:text-white size-5 text-brand-red"
-        @click="TodoListStore.deleteTodo(todo.id)">
-          <TrashIcon class="size-5 mx-auto"/>
-        </div>
-      </div>
+    <div class="text-brand-red text-sm ml-7">
+      {{ `Due ${isToday(props.todo.deadline_at) ? 'today!' : todo.deadline_at}` }}
+    </div>
     </div>
     <div v-if="open && todo.description" class="max-h-24 px-4 sm:px-6 overflow-y-auto">
       {{ todo.description }}
