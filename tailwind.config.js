@@ -3,6 +3,12 @@ export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontSize: {
+        '2xs': ['0.6rem', {
+          lineHeight: '0.75rem',
+        }],
+      },
+
       colors: {
         brand: {
           red: '#f65a5b',

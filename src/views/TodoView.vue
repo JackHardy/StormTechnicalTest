@@ -1,5 +1,5 @@
 <script setup>
-import TodoCard from "@/components/TodoCard.vue";
+import TodoList from "@/components/TodoList.vue";
 import {onBeforeMount} from "vue";
 import {useTodoListStore} from "@/stores/TodoListStore.js";
 
@@ -11,7 +11,8 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl">
-    <TodoCard v-for="todo in TodoListStore.todos" :index="todo.id" :todo="todo"/>
+  <div class="mx-auto max-w-3xl lg:max-w-7xl">
+    <h1 class="text-brand-red text-2xl my-4 font-bold ml-4">Todo List</h1>
+    <TodoList/>
   </div>
 </template>
