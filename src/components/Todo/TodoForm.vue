@@ -33,7 +33,7 @@ const TodoListStore = useTodoListStore();
         <NeutralButton class="w-28" @click="TodoListStore.resetForm()">
           Reset
         </NeutralButton>
-        <PrimaryButton :disabled="TodoListStore.isFormDisabled"
+        <PrimaryButton :disabled="!TodoListStore.isFormDirty"
                        class="w-24"
                        type="submit"
                        :is-thinking="TodoListStore.isThinking"

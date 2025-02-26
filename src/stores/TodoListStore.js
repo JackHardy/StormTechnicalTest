@@ -151,8 +151,8 @@ export const useTodoListStore = defineStore('TodoListStore', {
   },
 
   getters: {
-    isFormDisabled: (state) => {
-      return !state.form.title || !state.form.description || !state.form.deadline_at;
+    isFormDirty: (state) => {
+      return state.form.title || state.form.description || state.form.deadline_at;
     }
   }
 })
