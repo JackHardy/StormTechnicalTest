@@ -31,11 +31,11 @@ const TodoListStore = useTodoListStore();
                    :error="TodoListStore.errors?.deadline_at"/>
       </div>
       <div class="mt-4 flex items-center w-full gap-4 justify-between sm:justify-end">
-        <NeutralButton class="w-28" @click="TodoListStore.resetForm()">
+        <NeutralButton class="max-w-28" @click="TodoListStore.resetForm()">
           Reset
         </NeutralButton>
         <PrimaryButton :disabled="!TodoListStore.isFormDirty"
-                       class="w-24"
+                       class="max-w-24"
                        type="submit"
                        :is-thinking="TodoListStore.isThinking"
                        @click="TodoListStore.saveTodo()">

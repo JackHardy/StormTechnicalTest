@@ -38,7 +38,7 @@ const emit = defineEmits(['update:modelValue']);
       type="date"
       :class="{'ring-red-500': error}"
       :value="modelValue"
-      class="block w-full rounded-md ring-0 border bg-brand-white outline-none py-1.5 shadow-sm ring-1 ring-inset placeholder:text-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-red px-6"
+      class="block w-full rounded-md ring ring-gray-300 bg-brand-white outline-none h-10 py-1.5 shadow-sm ring-1 ring-inset placeholder:text-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-red px-6"
       @input="emit('update:modelValue', $event.target.value)">
     <InputError v-if="error" :error="error"/>
   </div>

@@ -5,6 +5,7 @@ import { useTodoListStore } from "@/stores/TodoListStore.js";
 import { isToday, isPast } from "date-fns";
 import TodoStatusBadge from "@/components/Badges/TodoStatusBadge.vue";
 import TodoCardButtons from "@/components/Buttons/Todo/TodoCardButtons.vue";
+import {ArrowPathIcon} from "@heroicons/vue/24/solid/index.js";
 
 const props = defineProps({
   todo: {
@@ -53,8 +54,13 @@ const warning = computed(() => {
           </div>
           <TodoStatusBadge :status="isPast(props.todo.deadline_at) && !isToday(props.todo.deadline_at) ? 'overdue' : todo.status"/>
         </div>
-        <div v-if="todo.status !== 'complete'" class="hidden group-hover:flex right-2 -top-7 absolute items-center gap-1">
-          <TodoCardButtons :todo="todo" :card-index="cardIndex" @edit="open = true"/>
+        <div v-if="todo.status !== 'complete'"
+             class="hidden group-hover:flex right-2 -top-7 absolute items-center gap-1">
+          <div v-if="TodoListStore.isThinking"
+               class="size-7 flex items-center rounded-full p-1 size-5 text-brand-red">
+            <ArrowPathIcon v-if="TodoListStore.isThinking" class="animate-spin size-5"/>
+          </div>
+          <TodoCardButtons v-else :todo="todo" :card-index="cardIndex" @edit="open = true"/>
         </div>
       </div>
     <div class="text-brand-red text-sm ml-7">

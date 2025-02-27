@@ -169,7 +169,7 @@ export const useTodoListStore = defineStore('TodoListStore', {
         };
 
         if(data.success) {
-          this.todos[cardIndex-1].status = type;
+          this.todos[cardIndex - 1].status = type;
         }
       }, 1000);
     },
@@ -209,14 +209,19 @@ export const useTodoListStore = defineStore('TodoListStore', {
 
     deleteTodo(id) {
       // fake a basic delete API call
-      const data = {
-        success: true,
-        message: 'Todo deleted successfully',
-      };
+      this.isThinking = true;
+      setTimeout(()=>{
+        this.isThinking = false;
 
-      if(data.success) {
-        this.todos = this.todos.filter(todo => todo.id !== id);
-      }
+        const data = {
+          success: true,
+          message: 'Todo deleted successfully',
+        };
+
+        if(data.success) {
+          this.todos = this.todos.filter(todo => todo.id !== id);
+        }
+      }, 1500);
     }
   },
 
@@ -224,6 +229,6 @@ export const useTodoListStore = defineStore('TodoListStore', {
     isFormDirty: (state) => {
       return state.form.title || state.form.description || state.form.deadline_at;
     },
-    arrayIndex: (state) => state.editingTodo - 1,
+    arrayIndex: (state) => state.editingIndex - 1,
   }
 })
