@@ -156,59 +156,23 @@ export const useTodoListStore = defineStore('TodoListStore', {
     },
 
     // obviously at this point I would want to be passing though an id but for the sake of this example I'm just passing through the card index
-    async holdTodo(cardIndex) {
-      // fake a basic update API call to put to-do on hold with fake loading time
+    async progressTodo(cardIndex, type) {
+      // fake a basic update API call to move through statuses with fake loading time
       this.isThinking = true;
       setTimeout(()=>{
         this.isThinking = false;
 
+        // endpoint would be variable based on the type of status change
         const data = {
           success: true,
           message: 'Todo held successfully',
         };
 
         if(data.success) {
-          this.todos[cardIndex-1].status = 'todo';
+          this.todos[cardIndex-1].status = type;
         }
       }, 1000);
     },
-
-    // obviously at this point I would want to be passing though an id but for the sake of this example I'm just passing through the card index
-    async progressTodo(cardIndex) {
-      // fake a basic update API call to put to-do in progress with fake loading time
-      this.isThinking = true;
-      setTimeout(()=>{
-        this.isThinking = false;
-
-        const data = {
-          success: true,
-          message: 'Todo held successfully',
-        };
-
-        if(data.success) {
-          this.todos[cardIndex-1].status = 'in-progress';
-        }
-      }, 1000);
-    },
-
-    // obviously at this point I would want to be passing though an id but for the sake of this example I'm just passing through the card index
-    async completeTodo(cardIndex) {
-      // fake a basic update API call to put to-do in progress with fake loading time
-      this.isThinking = true;
-      setTimeout(()=>{
-        this.isThinking = false;
-
-        const data = {
-          success: true,
-          message: 'Todo held successfully',
-        };
-
-        if(data.success) {
-          this.todos[cardIndex-1].status = 'complete';
-        }
-      }, 1000);
-    },
-
 
     validateForm() {
       const errors = {};
