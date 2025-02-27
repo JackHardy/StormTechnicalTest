@@ -12,7 +12,7 @@ export const useTodoListStore = defineStore('TodoListStore', {
       status: 'todo',
       deadline_at: '',
     },
-    editingTodo: null,
+    editingIndex: null,
     isThinking: false,
     formOpen: false,
   }),
@@ -62,13 +62,13 @@ export const useTodoListStore = defineStore('TodoListStore', {
 
     closeForm() {
       this.formOpen = false;
-      this.editingTodo = null;
+      this.editingIndex = null;
       this.resetForm();
     },
 
     editTodo(todo, cardIndex) {
       this.resetErrors();
-      this.editingTodo = cardIndex;
+      this.editingIndex = cardIndex;
       this.form = {
         title: todo.title,
         description: todo.description,
@@ -81,7 +81,7 @@ export const useTodoListStore = defineStore('TodoListStore', {
     resetForm() {
       this.resetErrors();
 
-      if(this.editingTodo !== null) {
+      if(this.editingIndex !== null) {
         this.form = {
           title: this.todos[this.arrayIndex].title,
           description: this.todos[this.arrayIndex].description,
@@ -101,7 +101,7 @@ export const useTodoListStore = defineStore('TodoListStore', {
     },
 
     saveTodo() {
-      if(this.editingTodo !== null) {
+      if(this.editingIndex !== null) {
         this.updateTodo();
       } else {
         this.storeTodo();
@@ -148,12 +148,67 @@ export const useTodoListStore = defineStore('TodoListStore', {
           this.todos[this.arrayIndex].deadline_at = this.form.deadline_at;
 
           this.formOpen = false;
-          this.editingTodo = null;
+          this.editingIndex = null;
         } else {
           this.errors = response.data.errors;
         }
       }, 2000);
     },
+
+    // obviously at this point I would want to be passing though an id but for the sake of this example I'm just passing through the card index
+    async holdTodo(cardIndex) {
+      // fake a basic update API call to put to-do on hold with fake loading time
+      this.isThinking = true;
+      setTimeout(()=>{
+        this.isThinking = false;
+
+        const data = {
+          success: true,
+          message: 'Todo held successfully',
+        };
+
+        if(data.success) {
+          this.todos[cardIndex-1].status = 'todo';
+        }
+      }, 1000);
+    },
+
+    // obviously at this point I would want to be passing though an id but for the sake of this example I'm just passing through the card index
+    async progressTodo(cardIndex) {
+      // fake a basic update API call to put to-do in progress with fake loading time
+      this.isThinking = true;
+      setTimeout(()=>{
+        this.isThinking = false;
+
+        const data = {
+          success: true,
+          message: 'Todo held successfully',
+        };
+
+        if(data.success) {
+          this.todos[cardIndex-1].status = 'in-progress';
+        }
+      }, 1000);
+    },
+
+    // obviously at this point I would want to be passing though an id but for the sake of this example I'm just passing through the card index
+    async completeTodo(cardIndex) {
+      // fake a basic update API call to put to-do in progress with fake loading time
+      this.isThinking = true;
+      setTimeout(()=>{
+        this.isThinking = false;
+
+        const data = {
+          success: true,
+          message: 'Todo held successfully',
+        };
+
+        if(data.success) {
+          this.todos[cardIndex-1].status = 'complete';
+        }
+      }, 1000);
+    },
+
 
     validateForm() {
       const errors = {};
