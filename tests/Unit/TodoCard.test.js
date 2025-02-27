@@ -1,16 +1,25 @@
-import { mount } from "@vue/test-utils";
+import {flushPromises, mount} from "@vue/test-utils";
 import { describe, it, expect, vi } from "vitest";
 import TodoCard from "@/components/Todo/TodoCard.vue";
 import { useTodoListStore } from "@/stores/TodoListStore.js";
 import {format, subDays} from "date-fns";
 import {ExclamationTriangleIcon} from "@heroicons/vue/24/solid";
+import TodoCardButtons from "@/components/Buttons/Todo/TodoCardButtons.vue";
+import {createPinia, setActivePinia} from "pinia";
+import {createApp} from "vue";
 
-// Mock store
-vi.mock("@/stores/TodoListStore.js", () => ({
-  useTodoListStore: vi.fn(() => ({})),
-}));
+const app = createApp({})
 
 describe("TodoCard.vue", () => {
+  let todoListStore;
+
+  beforeEach(() => {
+    const pinia = createPinia()
+    app.use(pinia)
+    setActivePinia(pinia)
+    todoListStore = useTodoListStore();
+  });
+
   const mockTodo = {
     title: "Test Todo",
     description: "This is a test description",
@@ -35,11 +44,79 @@ describe("TodoCard.vue", () => {
       props: { todo: mockTodo, cardIndex: 1 },
     });
 
-    expect(wrapper.vm.open).toBe(false); // Initially closed
+    expect(wrapper.vm.open).toBe(false);
     await wrapper.trigger("click");
-    expect(wrapper.vm.open).toBe(true); // Opens on click
+    expect(wrapper.vm.open).toBe(true);
     await wrapper.trigger("click");
-    expect(wrapper.vm.open).toBe(false); // Closes on second click
+    expect(wrapper.vm.open).toBe(false);
+  });
+
+  it("check to do button show on hover", async () => {
+    const wrapper = mount(TodoCard, {
+      props: { todo: mockTodo, cardIndex: 1 },
+    });
+
+    await wrapper.trigger("mouseover");
+    expect(wrapper.findComponent(TodoCardButtons).exists()).toBe(true);
+  });
+
+  it("progresses the status to in progress when the progress button is clicked", async () => {
+    const progressTodo = vi.spyOn(todoListStore, 'progressTodo');
+    const wrapper = mount(TodoCard, {
+      props: { todo: mockTodo, cardIndex: 1 },
+    });
+
+    await wrapper.trigger("mouseover");
+    const todoCardButtonsWrapper = wrapper.findComponent(TodoCardButtons)
+    const buttonWrapper = todoCardButtonsWrapper.find({ ref: 'progress-button' })
+    await buttonWrapper.trigger("click");
+    expect(progressTodo).toHaveBeenCalledTimes(1);
+    expect(progressTodo).toHaveBeenCalledWith(wrapper.props('cardIndex'), 'in-progress');
+  });
+
+  it("progresses the status to complete when the complete button is clicked", async () => {
+    const progressTodo = vi.spyOn(todoListStore, 'progressTodo');
+    const inProgressTodo = { ...mockTodo, status: 'in-progress' };
+    const wrapper = mount(TodoCard, {
+      props: { todo: inProgressTodo, cardIndex: 1 },
+    });
+
+    await wrapper.trigger("mouseover");
+    const todoCardButtonsWrapper = wrapper.findComponent(TodoCardButtons)
+    const buttonWrapper = todoCardButtonsWrapper.find({ ref: 'complete-button' })
+    await buttonWrapper.trigger("click");
+    expect(progressTodo).toHaveBeenCalledTimes(1);
+    expect(progressTodo).toHaveBeenCalledWith(wrapper.props('cardIndex'), 'complete');
+  });
+
+  it("progresses the status back to todo when the hold button is clicked", async () => {
+    const progressTodo = vi.spyOn(todoListStore, 'progressTodo');
+    const inProgressTodo = { ...mockTodo, status: 'in-progress' };
+    const wrapper = mount(TodoCard, {
+      props: { todo: inProgressTodo, cardIndex: 1 },
+    });
+
+    await wrapper.trigger("mouseover");
+    const todoCardButtonsWrapper = wrapper.findComponent(TodoCardButtons)
+    const buttonWrapper = todoCardButtonsWrapper.find({ ref: 'hold-button' })
+    await buttonWrapper.trigger("click");
+    expect(progressTodo).toHaveBeenCalledTimes(1);
+    expect(progressTodo).toHaveBeenCalledWith(wrapper.props('cardIndex'), 'todo');
+  });
+
+  it("todo is deleted when the delete button is clicked", async () => {
+    const deleteTodo = vi.spyOn(todoListStore, 'deleteTodo');
+    const wrapper = mount(TodoCard, {
+      props: { todo: mockTodo, cardIndex: 1 },
+    });
+
+    await wrapper.trigger("mouseover");
+    const todoCardButtonsWrapper = wrapper.findComponent(TodoCardButtons)
+    const buttonWrapper = todoCardButtonsWrapper.find({ ref: 'delete-button' })
+    await buttonWrapper.trigger("click");
+    expect(deleteTodo).toHaveBeenCalledTimes(1);
+    await flushPromises();
+    expect(todoListStore.todos).toHaveLength(0);
   });
 
   it("shows warning if the deadline is today or past", () => {
@@ -72,7 +149,7 @@ describe("TodoCard.vue", () => {
   });
 
   it("disables interactions when another card is being edited", () => {
-    useTodoListStore.mockReturnValue({ editingIndex: 2 }); // Simulate another card being edited
+    todoListStore.editingIndex = 2;
     const wrapper = mount(TodoCard, {
       props: { todo: mockTodo, cardIndex: 1 },
     });
