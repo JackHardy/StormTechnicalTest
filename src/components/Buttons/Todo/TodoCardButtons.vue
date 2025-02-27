@@ -1,6 +1,5 @@
 <script setup>
 import {
-  ArrowPathIcon,
   CheckBadgeIcon,
   PencilSquareIcon,
   PlayIcon,

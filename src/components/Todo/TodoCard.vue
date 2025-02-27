@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref} from "vue";
-import { TrashIcon, ExclamationTriangleIcon, PencilSquareIcon, PlayIcon, StopIcon, CheckBadgeIcon } from '@heroicons/vue/24/solid'
+import { ExclamationTriangleIcon } from '@heroicons/vue/24/solid'
 import { useTodoListStore } from "@/stores/TodoListStore.js";
 import { isToday, isPast } from "date-fns";
 import TodoStatusBadge from "@/components/Badges/TodoStatusBadge.vue";

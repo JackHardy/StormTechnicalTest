@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import {reactive} from "vue";
 import {format, addDays, subDays} from "date-fns";
 
 export const useTodoListStore = defineStore('TodoListStore', {
